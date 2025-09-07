@@ -1,12 +1,16 @@
 from __future__ import annotations
-import argparse
+import typer
 from .api_client import LogseqAPI
 from .fs_writer import append_journal, append_to_page
 from .indexer import list_pages, list_journals, grep
 from .reconciler import Queue, Action, reconcile
 
+app = typer.Typer()
 
-def cmd_check(_: argparse.Namespace) -> None:
+
+@app.command()
+def check() -> None:
+    """Check API availability"""
     api = LogseqAPI()
     ok = api.is_available()
     print(f"Logseq API available: {ok}")
@@ -18,69 +22,50 @@ def cmd_check(_: argparse.Namespace) -> None:
             print(f"API reachable but get_current_graph failed: {e}")
 
 
-def cmd_add_journal(ns: argparse.Namespace) -> None:
-    path = append_journal(ns.content)
+@app.command()
+def add_journal(content: str) -> None:
+    """Append a journal entry (filesystem)"""
+    path = append_journal(content)
     print(f"Wrote journal entry → {path}")
 
 
-def cmd_add_page(ns: argparse.Namespace) -> None:
-    path = append_to_page(ns.name, ns.content)
+@app.command()
+def add_page(name: str, content: str) -> None:
+    """Append to a page (filesystem)"""
+    path = append_to_page(name, content)
     print(f"Appended to page → {path}")
 
 
-def cmd_queue_create_page(ns: argparse.Namespace) -> None:
+@app.command()
+def queue_create_page(name: str, content: str) -> None:
+    """Queue a page creation for later API reconcile"""
     q = Queue()
-    q.add(Action(type="create_page", payload={"name": ns.name, "content": ns.content}))
+    q.add(Action(type="create_page", payload={"name": name, "content": content}))
     print("Queued create_page action.")
 
 
-def cmd_reconcile(_: argparse.Namespace) -> None:
+@app.command()
+def reconcile() -> None:
+    """Apply queued actions via API if available"""
     applied = reconcile(LogseqAPI())
     print(f"Reconciled actions: {applied}")
 
 
-def cmd_list(_: argparse.Namespace) -> None:
+@app.command()
+def list() -> None:
+    """List pages/journals (filesystem)"""
     print("Pages:", list_pages())
     print("Journals:", list_journals())
 
 
-def cmd_grep(ns: argparse.Namespace) -> None:
-    print(grep(ns.term))
+@app.command()
+def grep(term: str) -> None:
+    """Naive grep across graph"""
+    print(grep(term))
 
 
 def main() -> None:
-    p = argparse.ArgumentParser(prog="logseq-hybrid")
-    sub = p.add_subparsers(required=True)
-
-    s = sub.add_parser("check", help="Check API availability")
-    s.set_defaults(func=cmd_check)
-
-    s = sub.add_parser("add-journal", help="Append a journal entry (filesystem)")
-    s.add_argument("content")
-    s.set_defaults(func=cmd_add_journal)
-
-    s = sub.add_parser("add-page", help="Append to a page (filesystem)")
-    s.add_argument("name")
-    s.add_argument("content")
-    s.set_defaults(func=cmd_add_page)
-
-    s = sub.add_parser("queue-create-page", help="Queue a page creation for later API reconcile")
-    s.add_argument("name")
-    s.add_argument("content")
-    s.set_defaults(func=cmd_queue_create_page)
-
-    s = sub.add_parser("reconcile", help="Apply queued actions via API if available")
-    s.set_defaults(func=cmd_reconcile)
-
-    s = sub.add_parser("list", help="List pages/journals (filesystem)")
-    s.set_defaults(func=cmd_list)
-
-    s = sub.add_parser("grep", help="Naive grep across graph")
-    s.add_argument("term")
-    s.set_defaults(func=cmd_grep)
-
-    ns = p.parse_args()
-    ns.func(ns)
+    app()
 
 if __name__ == "__main__":
     main()
