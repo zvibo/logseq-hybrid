@@ -134,8 +134,6 @@ class LogseqAPI:
         return self.call("logseq.App.getCurrentGraph")
 ```
 
-````
-
 ---
 
 ## 🗂️ logseq_hybrid/fs_writer.py
@@ -180,7 +178,7 @@ def append_journal(content: str, date: Optional[datetime] = None) -> Path:
         new = entry
     _atomic_write(path, new)
     return path
-````
+```
 
 ---
 
