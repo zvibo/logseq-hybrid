@@ -1,10 +1,31 @@
 from __future__ import annotations
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, TypedDict
 from .settings import PAGES_DIR, JOURNALS_DIR
 
+class Page(TypedDict):
+    name: str
+    file_path: str
+    mtime: float
+    size: int
+
+def get_pages_details() -> List[Page]:
+    """Returns a list of dictionaries with details for each page."""
+    pages = []
+    for p in PAGES_DIR.glob("*.md"):
+        stat = p.stat()
+        pages.append(
+            Page(
+                name=p.stem,
+                file_path=str(p),
+                mtime=stat.st_mtime,
+                size=stat.st_size,
+            )
+        )
+    return pages
+
 def list_pages() -> List[str]:
-    return sorted([p.stem for p in PAGES_DIR.glob("*.md")])
+    return sorted([p["name"] for p in get_pages_details()])
 
 def list_journals() -> List[str]:
     return sorted([p.stem for p in JOURNALS_DIR.glob("*.md")])
