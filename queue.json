@@ -1,0 +1,9 @@
+[
+  {
+    "type": "create_page",
+    "payload": {
+      "name": "QueuedPage",
+      "content": "hello"
+    }
+  }
+]

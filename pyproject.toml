@@ -1,0 +1,11 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "logseq-hybrid"
+version = "0.1.0"
+dependencies = ["requests", "python-dotenv"]
+
+[project.scripts]
+logseq-hybrid = "logseq_hybrid.cli:main"
