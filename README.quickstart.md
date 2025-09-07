@@ -1,44 +1,37 @@
-# Quickstart
+# Quickstart Guide
 
-1. Copy this project into a folder **outside** your Logseq graph.
-2. Create and edit `.env` from `.env.example`.
-3. Enable **Logseq → Settings → Features → Enable HTTP API** and copy the token.
-4. Install & run:
+This guide will walk you through the initial setup of `logseq-hybrid`.
 
-```bash
-make install
-# Sanity check (works even if Logseq closed; just reports availability)
-make check
-```
+## Installation
 
-5. Filesystem demo (works headless):
+1.  **Clone the repository:**
 
-```bash
-# Append to today’s journal
-. .venv/bin/activate && python -m logseq_hybrid.cli add-journal "hello from FS"
-# Append to a page (creates if missing)
-. .venv/bin/activate && python -m logseq_hybrid.cli add-page "Agent Scratch" "first note"
-```
+    ```bash
+    git clone <repository-url>
+    cd logseq-hybrid
+    ```
 
-6. Queue a surgical edit and reconcile later:
+2.  **Create a virtual environment:**
 
-```bash
-# Queue a create_page (safe to run headless)
-. .venv/bin/activate && python -m logseq_hybrid.cli queue-create-page "Surgical API Page" "seed content"
+    ```bash
+    python -m venv .venv
+    source .venv/bin/activate
+    ```
 
-# Later, when Logseq is open (API enabled):
-. .venv/bin/activate && python -m logseq_hybrid.cli reconcile
-```
+3.  **Install the package in development mode:**
 
-7. Optional: simple reads over FS cache
+    This command installs the package and its dependencies. The `-e` flag (for "editable") means that any changes you make to the source code will be immediately available when you run the command-line tool.
+
+    ```bash
+    pip install -e .
+    ```
+
+## Shell Completion
+
+To enable shell autocompletion for the `logseq-hybrid` command, run the following command and follow the on-screen instructions. This will make it easier to use the tool by allowing you to tab-complete commands and arguments.
 
 ```bash
-. .venv/bin/activate && python -m logseq_hybrid.cli list
-. .venv/bin/activate && python -m logseq_hybrid.cli grep "keyword"
+logseq-hybrid --install-completion bash
 ```
 
-## Notes
-
-* **API path** requires Logseq to be open; FS path works always.
-* Writes are **append-only** in FS mode to avoid corrupting block IDs/backlinks.
-* Reconciler clears the queue only after successful API application.
+After installation, you may need to restart your shell or source your shell's configuration file (e.g., `source ~/.bashrc`) for the changes to take effect.
